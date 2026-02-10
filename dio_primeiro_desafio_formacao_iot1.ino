@@ -1,0 +1,42 @@
+// Definição dos pinos
+const int pinoSensor = A0;
+const int pinoMotor = 9;
+const int pinoLED = 13;
+const int pinoBuzina = 8;
+
+void setup() {
+  pinMode(pinoMotor, OUTPUT);
+  pinMode(pinoLED, OUTPUT);
+  pinMode(pinoBuzina, OUTPUT);
+  Serial.begin(9600); // Para monitorar a temperatura no computador
+}
+
+void loop() {
+  // 1. Leitura da temperatura (conversão de voltagem para Celsius)
+  int leituraADC = analogRead(pinoSensor);
+  float voltagem = leituraADC * (5.0 / 1024.0);
+  float temperaturaC = (voltagem - 0.5) * 100;
+
+  // Exibe a temperatura no Monitor Serial
+  Serial.print("Temperatura: ");
+  Serial.print(temperaturaC);
+  Serial.println(" C");
+
+  // 2. Lógica do Ventilador (>= 30°C)
+  if (temperaturaC >= 30) {
+    digitalWrite(pinoMotor, HIGH);
+  } else {
+    digitalWrite(pinoMotor, LOW);
+  }
+
+  // 3. Lógica de Emergência (> 50°C)
+  if (temperaturaC > 50) {
+    digitalWrite(pinoLED, HIGH);
+    tone(pinoBuzina, 440); // Toca uma nota de 440Hz
+  } else {
+    digitalWrite(pinoLED, LOW);
+    noTone(pinoBuzina);    // Desliga o som
+  }
+
+  delay(500); // Pequena pausa para estabilidade
+}
